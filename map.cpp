@@ -1,5 +1,5 @@
 #include "lunamiga.h"
-#include <iostream>
+//#include <iostream>
 void MapInit(maindata *lunadata) {
 	lunadata->map.MapCols = -1;
 	MapChangeMapColors(lunadata);

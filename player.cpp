@@ -1,4 +1,5 @@
 #include "lunamiga.h"
+#include <stdlib.h>
 
 void PlayerInit(maindata *lunadata) {
 	lunadata->SPRITE_ENA = 0xFD;

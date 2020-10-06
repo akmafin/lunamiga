@@ -1,6 +1,6 @@
 #include "lunamiga.h"
-#include <cmath>
-#include <iostream>
+#include <math.h>
+//#include <iostream>
 void EnemiesInit(struct maindata *lunadata) {
 	lunadata->enemies.CurrentEnemyCount = 0;
 	lunadata->enemies.CurrentWaveNumber = 0;

@@ -1,7 +1,8 @@
 #include "lunamiga.h"
-#include <iostream>
+//#include <iostream>
 
 void SoundInit(maindata *lunadata) {
+/*MOD
 	int init = Mix_Init(MIX_INIT_OGG);
 
 	if ((init&MIX_INIT_OGG) != MIX_INIT_OGG)
@@ -38,23 +39,24 @@ void SoundInit(maindata *lunadata) {
 			//sndena = false;
 		}
 	}
+*/
 }
 
 void SoundGetNextChannel(maindata *lunadata) {
 }
 
 void SoundSfxShoot(maindata *lunadata) {
-	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_SHOOT], lunadata->sound.mixchunk[SOUND_SHOOT], 0);
+//MOD	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_SHOOT], lunadata->sound.mixchunk[SOUND_SHOOT], 0);
 }
 
 void SoundSfxExplode(maindata *lunadata) {
-	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_EXPLODE], lunadata->sound.mixchunk[SOUND_EXPLODE], 0);
+//MOD	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_EXPLODE], lunadata->sound.mixchunk[SOUND_EXPLODE], 0);
 }
 
 void SoundSfxBonus(maindata *lunadata) {
-	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_BONUS], lunadata->sound.mixchunk[SOUND_BONUS], 0);
+//MOD	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_BONUS], lunadata->sound.mixchunk[SOUND_BONUS], 0);
 }
 
 void SoundSfxScream(maindata *lunadata) {
-	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_SCREAM], lunadata->sound.mixchunk[SOUND_SCREAM], 0);
+//MOD	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_SCREAM], lunadata->sound.mixchunk[SOUND_SCREAM], 0);
 }

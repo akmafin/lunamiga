@@ -1,12 +1,19 @@
 #ifndef lunapc_h
 #define lunapc_h
 
+#include <proto/exec.h>
+#include <proto/intuition.h>
+#include <proto/dos.h>
+#include <exec/ports.h>
+#include <exec/execbase.h>
+#include <devices/keyboard.h>
 #include "bullets.h"
 #include "enemies.h"
 #include "hud.h"
 #include "map.h"
 #include "player.h"
 #include "sound.h"
+#include "ami.h"
 
 #define GAMESTATE_QUIT				0
 #define GAMESTATE_MENU				1
@@ -23,33 +30,43 @@
 #define SPRITETILE_WIDTH			48
 #define SPRITETILE_HEIGHT			42
 
+#define KEYMATRIX_LEN   			16
+
 struct maindata {
+/*MOD
 	SDL_Window *mainwin;
 	SDL_Renderer *mainrend;
 	SDL_Texture *gamefonttex, *gamespritetex;
 	SDL_GameController *gc;
-	int gamestate, IntroActive = 0, MusicActive = 1, fullscreen = 0;
-	int DeathAnimTimer[2] = {0, 4};
-	int DeathAnimIndex = 0, DeathFrames[5] = {68, 69, 70, 71, 67};
-	int GameOverFirePressed = 0, GameOverFireCountdown = 0, GameOverMusicTimer = 0;
-	int GameOverSinTicker = 0, GameOverColRamp[8] = {1, 11, 3, 12, 4, 2, 9, 8};
-	int SCREEN[1000], COLORRAM[1000], RandomNum = 0x62;
-	int ZP_COUNTER = 0;
-	int SPRITE_ENA = 0, SPRITE_PTRS[8] = {0}, SPRITE_X[8], SPRITE_Y[8];
-	int GameOverSinY[256] = {0};
-	int HighscoreAchieved = 0;
-	int MessageIndex = 0, MessageLength = 0;
-	char Hiscore[41] = "\0\0\0\0\0\0\0\0\0\0\0\0\x8\x9\x13\x3\xF\x12\x5\0\0\x30\x30\x30\x30\x30\x30\x30\0\0\0\0\0\0\0\0\0\0\0\0";
-	char HighScoreText[27] = "\0\0\x1F\x1F\x1F\0\xE\x5\x17\0\x8\x9\x7\x8\0\x13\x3\xF\x12\x5\0\x1F\x1F\x1F\0\0";
-	char MessageText[500] = {0};
-	char IntroMap[440] = {0};
-	uint32_t RandomNumState = 0x62;
+*/
+	int gamestate, IntroActive, MusicActive, fullscreen;
+	int DeathAnimTimer[2];
+	int DeathAnimIndex, DeathFrames[5];
+	int GameOverFirePressed, GameOverFireCountdown, GameOverMusicTimer;
+	int GameOverSinTicker, GameOverColRamp[8];
+	int SCREEN[1000], COLORRAM[1000], RandomNum;
+	int ZP_COUNTER;
+	int SPRITE_ENA, SPRITE_PTRS[8], SPRITE_X[8], SPRITE_Y[8];
+	int GameOverSinY[256];
+	int HighscoreAchieved;
+	int MessageIndex, MessageLength;
+	char Hiscore[41];
+	char HighScoreText[27];
+	char MessageText[500];
+	char IntroMap[440];
+	int RandomNumState;
 	struct bullets bullets;
 	struct enemies enemies;
 	struct hud hud;
 	struct map map;
 	struct player player;
 	struct sound sound;
+	struct Library *DOSBase, *GraphicsBase, *IntuitionBase;
+	struct Screen *MyScreen;
+	struct Window *MyWindow;
+	struct MsgPort *keymp;
+	struct IOStdReq *keyioreq;
+	UBYTE keymatrix[KEYMATRIX_LEN];
 };
 
 void MainMenu(struct maindata *lunadata);
@@ -70,6 +87,6 @@ void ClearStars(struct maindata *lunadata);
 void CheckForHighscore(struct maindata *lunadata);
 void StopSounds(struct maindata *lunadata);
 unsigned char CharToDispChar(unsigned char inchr);
-int StrToDispStr(const char* instr, char* outstr, int outbuflen);
+int StrToDispStr(char *str, int outbuflen);
 
 #endif
