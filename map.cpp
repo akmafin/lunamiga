@@ -3,8 +3,8 @@
 void MapInit(maindata *lunadata) {
 	lunadata->map.MapCols = -1;
 	MapChangeMapColors(lunadata);
-	ClearScreen(lunadata);
-	ClearColor(lunadata);
+	GameClearScreen(lunadata);
+	GameClearColor(lunadata);
 	for(int i = 0; i < 40; i++)
 		lunadata->SCREEN[24 * 40 + i] = 0;
 	lunadata->map.HscrollSpeed = 1;

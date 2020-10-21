@@ -4,9 +4,11 @@
 #include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/dos.h>
+#include <proto/graphics.h>
 #include <exec/ports.h>
 #include <exec/execbase.h>
 #include <devices/keyboard.h>
+#include <graphics/rastport.h>
 #include "bullets.h"
 #include "enemies.h"
 #include "hud.h"
@@ -25,14 +27,21 @@
 #define SUBTUNE_GAMEOVER			1
 #define SUBTUNE_BLANK				2
 
-#define FONTTILE_WIDTH				16
-#define FONTTILE_HEIGHT				16
-#define SPRITETILE_WIDTH			48
-#define SPRITETILE_HEIGHT			42
+#define FONTTILE_WIDTH				8
+#define FONTTILE_HEIGHT				8
+#define SPRITETILE_WIDTH			24
+#define SPRITETILE_HEIGHT			21
 
 #define KEYMATRIX_LEN   			16
 
 struct maindata {
+	struct Library *DOSBase, *GraphicsBase, *IntuitionBase;
+	struct Screen *MyScreen;
+	struct Window *MyWindow;
+	struct MsgPort *keymp;
+	struct IOStdReq *keyioreq;
+	struct BitMap mycharbitmap;
+	char* mycharplanes;
 /*MOD
 	SDL_Window *mainwin;
 	SDL_Renderer *mainrend;
@@ -50,22 +59,17 @@ struct maindata {
 	int GameOverSinY[256];
 	int HighscoreAchieved;
 	int MessageIndex, MessageLength;
+	int RandomNumState;
 	char Hiscore[41];
 	char HighScoreText[27];
 	char MessageText[500];
 	char IntroMap[440];
-	int RandomNumState;
 	struct bullets bullets;
 	struct enemies enemies;
 	struct hud hud;
 	struct map map;
 	struct player player;
 	struct sound sound;
-	struct Library *DOSBase, *GraphicsBase, *IntuitionBase;
-	struct Screen *MyScreen;
-	struct Window *MyWindow;
-	struct MsgPort *keymp;
-	struct IOStdReq *keyioreq;
 	UBYTE keymatrix[KEYMATRIX_LEN];
 };
 
@@ -76,8 +80,8 @@ void GameInit(struct maindata *lunadata);
 void GameClean(struct maindata *lunadata);
 void GameDrawScreen(maindata *lunadata);
 void GameDelay(maindata *lunadata);
-void ClearScreen(struct maindata *lunadata);
-void ClearColor(struct maindata *lunadata);
+void GameClearScreen(struct maindata *lunadata);
+void GameClearColor(struct maindata *lunadata);
 void RandomInit(struct maindata *lunadata);
 void RandomGet(struct maindata *lunadata);
 void DrawHighscore(struct maindata *lunadata);
