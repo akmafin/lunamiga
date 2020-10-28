@@ -4,8 +4,8 @@
 #define MAX_BULLETS					8
 
 struct bullets {
-	int BulletIndex = 0;
-	int BulletType[MAX_BULLETS] = {0}, BulletX[MAX_BULLETS] = {0}, BulletY[MAX_BULLETS] = {0};
+	int BulletIndex;
+	int BulletType[MAX_BULLETS], BulletX[MAX_BULLETS], BulletY[MAX_BULLETS];
 };
 
 void BulletsInit(struct maindata *lunadata);

@@ -2,6 +2,28 @@
 #include <math.h>
 //#include <iostream>
 void EnemiesInit(struct maindata *lunadata) {
+	int DeathFrames[5] = {68, 69, 70, 71, 67};
+	int EnemyStartFrames[6] = {72, 88, 96, 112, 120, 128};
+	int EnemyFrameCount[6] = {10, 6, 4, 4, 4, 4};
+	int EnemyWaveTypes[MAX_ENEMIES][8] = {
+		{1, 0, 0, 0, 0, 1, 0, 0},
+		{0, 0, 0, 1, 0, 0, 0, 1},
+		{0, 1, 1, 0, 1, 0, 0, 0},
+		{0, 0, 0, 1, 0, 0, 1, 1},
+		{1, 0, 0, 0, 0, 1, 0, 0},
+		{0, 0, 0, 1, 0, 0, 0, 1} };
+	
+	for(int i = 0; i < 5; i++)
+		lunadata->enemies.DeathFrames[i] = DeathFrames[i];
+	for(int i = 0; i < 6; i++)
+		lunadata->enemies.EnemyStartFrames[i] = EnemyStartFrames[i];
+	for(int i = 0; i < 6; i++)
+		lunadata->enemies.EnemyFrameCount[i] = EnemyFrameCount[i];
+	for(int i = 0; i < MAX_ENEMIES; i++) {
+		for(int j = 0; j < 8; j++)
+			lunadata->enemies.EnemyWaveTypes[i][j] = EnemyWaveTypes[i][j];
+	}
+
 	lunadata->enemies.CurrentEnemyCount = 0;
 	lunadata->enemies.CurrentWaveNumber = 0;
 	for(int i = 0; i < MAX_ENEMIES; i++) {
@@ -18,6 +40,7 @@ void EnemiesInit(struct maindata *lunadata) {
 	};
 	lunadata->enemies.SectorTransition = 0x20;
 	lunadata->enemies.CurrentWaveType = 0;
+	lunadata->enemies.EnemyAnimationTimer[1] = 3;
 }
 
 void EnemiesAddWave(struct maindata *lunadata) {

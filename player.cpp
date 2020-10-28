@@ -2,6 +2,15 @@
 #include <stdlib.h>
 
 void PlayerInit(maindata *lunadata) {
+	int PlayerFrames[3] = {64, 65, 66};
+
+	lunadata->player.PlayerAnimTimer[1] = 4;
+	lunadata->player.PlayerSpeedX[1] = 2;
+	lunadata->player.PlayerSpeedY[1] = 2;
+	lunadata->player.PlayerFireTimer[1] = 10;
+	for(int i = 0; i < 3; i++)
+		lunadata->player.PlayerFrames[i] = PlayerFrames[i];
+
 	lunadata->SPRITE_ENA = 0xFD;
 	lunadata->SPRITE_PTRS[0] = lunadata->player.PlayerFrames[0];
 	lunadata->player.PlayerX[1] = 128;

@@ -2,8 +2,13 @@
 #include <stdio.h>
 
 void HudInit(struct maindata *lunadata) {
+	int HUDDATA[40] = {31, 19, 3, 15, 18, 5, 33, 48, 48, 48,
+		48, 48, 48, 48, 31, 16, 15, 23, 5, 18,
+		33, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		31, 23, 1, 22, 5, 33, 48, 48, 48, 31};
+		
 	for(int i = 0; i < 40; i++) {
-		lunadata->SCREEN[24 * 40 + i] = lunadata->hud.HUDDATA[i];
+		lunadata->SCREEN[24 * 40 + i] = HUDDATA[i];
 	}
 }
 

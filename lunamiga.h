@@ -40,8 +40,8 @@ struct maindata {
 	struct Window *MyWindow;
 	struct MsgPort *keymp;
 	struct IOStdReq *keyioreq;
-	struct BitMap mycharbitmap;
-	char* mycharplanes;
+	struct BitMap mycharbitmap, myspritebitmap, mysbbitmap;
+	char *mycharplanes, *myspriteplanes, *mysbplanes;
 /*MOD
 	SDL_Window *mainwin;
 	SDL_Renderer *mainrend;
@@ -55,11 +55,12 @@ struct maindata {
 	int GameOverSinTicker, GameOverColRamp[8];
 	int SCREEN[1000], COLORRAM[1000], RandomNum;
 	int ZP_COUNTER;
-	int SPRITE_ENA, SPRITE_PTRS[8], SPRITE_X[8], SPRITE_Y[8];
+	int SPRITE_ENA, SPRITE_PTRS[8], SPRITE_X[8], SPRITE_Y[8], SPRITE_OLDX[8], SPRITE_OLDY[8];
 	int GameOverSinY[256];
 	int HighscoreAchieved;
 	int MessageIndex, MessageLength;
 	int RandomNumState;
+	int ScreenOffsetX, ScreenClear;
 	char Hiscore[41];
 	char HighScoreText[27];
 	char MessageText[500];
@@ -79,7 +80,6 @@ void GameOver(maindata *lunadata);
 void GameInit(struct maindata *lunadata);
 void GameClean(struct maindata *lunadata);
 void GameDrawScreen(maindata *lunadata);
-void GameDelay(maindata *lunadata);
 void GameClearScreen(struct maindata *lunadata);
 void GameClearColor(struct maindata *lunadata);
 void RandomInit(struct maindata *lunadata);

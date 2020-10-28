@@ -6,25 +6,19 @@
 #define ENEMY_UPDATE				3
 
 struct enemies {
-	int EnemyX0[MAX_ENEMIES] = {0}, EnemyX1[MAX_ENEMIES] = {0}, EnemyX2[MAX_ENEMIES] = {0};
-	int EnemyY0[MAX_ENEMIES] = {0}, EnemyY1[MAX_ENEMIES] = {0};
-	int EnemyActive[MAX_ENEMIES] = {0}, EnemyAnimIndex[MAX_ENEMIES] = {0};
-	int EnemyDying[MAX_ENEMIES] = {0}, EnemyDeathIndex[MAX_ENEMIES] = {0}, EnemyDeathFrame[MAX_ENEMIES] = {0};
-	int CurrentEnemyType = 0, CurrentWaveType = 0;
-	int CurrentEnemyCount = 0, CurrentEnemyKillCount = 0, CurrentWaveNumber = 0;
-	int EnemyFrame = 0, EnemyFrameIndex = 0, EnemyAnimationTimer[2] = {0, 3};
-	int DeathFrames[5] = {68, 69, 70, 71, 67};
-	int EnemyStartFrames[6] = {72, 88, 96, 112, 120, 128};
-	int EnemyFrameCount[6] = {10, 6, 4, 4, 4, 4};
-	int SectorTransition = 0, SinTicker[8] = {0};
-	int SinX[8][256] = {{0}}, SinY[8][256] = {{0}};
-	int EnemyWaveTypes[MAX_ENEMIES][8] = {
-		{1, 0, 0, 0, 0, 1, 0, 0},
-		{0, 0, 0, 1, 0, 0, 0, 1},
-		{0, 1, 1, 0, 1, 0, 0, 0},
-		{0, 0, 0, 1, 0, 0, 1, 1},
-		{1, 0, 0, 0, 0, 1, 0, 0},
-		{0, 0, 0, 1, 0, 0, 0, 1} };
+	int EnemyX0[MAX_ENEMIES], EnemyX1[MAX_ENEMIES], EnemyX2[MAX_ENEMIES];
+	int EnemyY0[MAX_ENEMIES], EnemyY1[MAX_ENEMIES];
+	int EnemyActive[MAX_ENEMIES], EnemyAnimIndex[MAX_ENEMIES];
+	int EnemyDying[MAX_ENEMIES], EnemyDeathIndex[MAX_ENEMIES], EnemyDeathFrame[MAX_ENEMIES];
+	int CurrentEnemyType, CurrentWaveType;
+	int CurrentEnemyCount, CurrentEnemyKillCount, CurrentWaveNumber;
+	int EnemyFrame, EnemyFrameIndex, EnemyAnimationTimer[2];
+	int DeathFrames[5];
+	int EnemyStartFrames[6];
+	int EnemyFrameCount[6];
+	int SectorTransition, SinTicker[8];
+	int SinX[8][256], SinY[8][256];
+	int EnemyWaveTypes[MAX_ENEMIES][8];
 };
 
 void EnemiesInit(struct maindata *lunadata);

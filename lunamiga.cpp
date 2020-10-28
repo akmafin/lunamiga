@@ -10,11 +10,11 @@
 
 #include "lunamiga.h"
 #include "font.h"
+#include "sprites.h"
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 //#include <iostream>
-//#include <chrono>
 
 int main( int argc, char* args[] ) {
 	maindata* lunadata;
@@ -50,12 +50,14 @@ void MainMenu(maindata *lunadata) {
 
 /*MOD	if(lunadata->MusicActive)
 		Mix_PlayMusic(lunadata->sound.musicgame, -1);*/
+	lunadata->ScreenOffsetX = 0;
 	MapInit(lunadata);
 	GameClearScreen(lunadata);
 
 	lunadata->IntroActive = 1;
 	lunadata->map.MinGap = 17;
 	lunadata->map.HscrollSpeed = 2;
+lunadata->map.HscrollSpeed = 2;
 	lunadata->SPRITE_ENA = 0;
 	lunadata->MessageIndex = lunadata->MessageLength - 35;
 	for(int i = 0; i < 8; i++)
@@ -72,9 +74,9 @@ void MainMenu(maindata *lunadata) {
 	DrawHighscore(lunadata);
 
 	while(lunadata->gamestate == GAMESTATE_MENU) {
-		GameDelay(lunadata);
+//		WaitBOVP(&lunadata->MyScreen->ViewPort);
+		WaitTOF();
 		GameDrawScreen(lunadata);
-
 		lunadata->GameOverSinTicker++;
 		
 		lunadata->SCREEN[1] = 40;
@@ -164,6 +166,7 @@ void MainMenu(maindata *lunadata) {
 void GameLoop(maindata *lunadata) {
 	struct IntuiMessage* msg;
 
+	lunadata->ScreenOffsetX = 0;
 	lunadata->IntroActive = 0;
 	MapInit(lunadata);
 	PlayerInit(lunadata);
@@ -174,11 +177,9 @@ void GameLoop(maindata *lunadata) {
 		Mix_PlayMusic(lunadata->sound.musicgame, -1);*/
 
 	while(lunadata->gamestate == GAMESTATE_RUNNING) {
-		GameDelay(lunadata);
+		WaitTOF();
 		GameDrawScreen(lunadata);
 
-Move(lunadata->MyWindow->RPort, 1 * 8, 20);
-Text(lunadata->MyWindow->RPort, "B", 1);
 		ClearStars(lunadata);
 		EnemiesDraw(lunadata);
 		BulletsClear(lunadata);
@@ -197,7 +198,17 @@ Text(lunadata->MyWindow->RPort, "B", 1);
 		DoIO((struct IORequest*)lunadata->keyioreq);
 		
 		if(lunadata->keymatrix[8] & 0x20)
-			lunadata->gamestate = GAMESTATE_QUIT;
+			lunadata->gamestate = GAMESTATE_MENU;
+		if((lunadata->keymatrix[9] & 0x10) || (lunadata->keymatrix[7] & 0x40))
+			lunadata->player.Joy |= JOY_UP;
+		if((lunadata->keymatrix[9] & 0x20) || (lunadata->keymatrix[3] & 0x40))
+			lunadata->player.Joy |= JOY_DOWN;
+		if((lunadata->keymatrix[9] & 0x40) || (lunadata->keymatrix[5] & 0x80))
+			lunadata->player.Joy |= JOY_RIGHT;
+		if((lunadata->keymatrix[9] & 0x80) || (lunadata->keymatrix[5] & 0x20))
+			lunadata->player.Joy |= JOY_LEFT;
+		if((lunadata->keymatrix[12] & 0x10) || (lunadata->keymatrix[6] & 0x08))
+			lunadata->player.Joy |= JOY_FIRE;
 
 		while((msg = (struct IntuiMessage*)GetMsg(lunadata->MyWindow->UserPort)) != NULL)
 		{
@@ -205,31 +216,6 @@ Text(lunadata->MyWindow->RPort, "B", 1);
 				lunadata->gamestate = GAMESTATE_QUIT;
 		}
 /*MOD
-		while(SDL_PollEvent(&e)) {
-
-			switch(e.type) {
-
-				case SDL_KEYDOWN:	
-					switch(e.key.keysym.scancode) {
-
-						case SDL_SCANCODE_ESCAPE:
-							lunadata->gamestate = GAMESTATE_QUIT;
-							break;
-							
-						default:
-							break;
-					}
-					break;
-
-				case SDL_QUIT:
-					lunadata->gamestate = GAMESTATE_QUIT;
-					break;
-
-				default:
-					break;
-			}
-		}
-
 		keystate=SDL_GetKeyboardState(NULL);
 		
 		if((keystate[SDL_SCANCODE_KP_8]) || (keystate[SDL_SCANCODE_W]) || (keystate[SDL_SCANCODE_UP]))
@@ -266,7 +252,7 @@ void GameOver(maindata *lunadata) {
 	CheckForHighscore(lunadata);
 	
 	while(lunadata->gamestate == GAMESTATE_GAMEOVER) {
-		GameDelay(lunadata);
+		WaitTOF();
 		GameDrawScreen(lunadata);
 
 		if(lunadata->GameOverFireCountdown > 0)
@@ -325,7 +311,7 @@ void GameOver(maindata *lunadata) {
 		DoIO((struct IORequest*)lunadata->keyioreq);
 		
 		if(lunadata->keymatrix[8] & 0x20)
-			lunadata->gamestate = GAMESTATE_QUIT;
+			lunadata->gamestate = GAMESTATE_MENU;
 		if((lunadata->keymatrix[12] & 0x10) || (lunadata->keymatrix[6] & 0x08)) {
 			if(lunadata->GameOverFireCountdown == 0)
 				lunadata->gamestate = GAMESTATE_MENU;
@@ -373,8 +359,8 @@ void GameOver(maindata *lunadata) {
 }
 
 void GameInit(maindata *lunadata) {
-	struct NewScreen screen = {0, 0, 320, 200, 4, 0, 0, 0, 0, 0, (UBYTE*)"LunAmiga", 0, 0};
-	struct NewWindow window = {0, 0, 320, 200, 0, 0, IDCMP_CLOSEWINDOW | IDCMP_VANILLAKEY | IDCMP_RAWKEY, WFLG_CLOSEGADGET, 0, 0, (UBYTE*)"LunAmiga", 0, 0, 320, 200, 320, 200, CUSTOMSCREEN};
+	struct NewScreen screen = {0, 0, 320, 200, 3, 0, 0, 0, 0, 0, (UBYTE*)"LunAmiga", 0, 0};
+	struct NewWindow window = {0, 0, 320, 200, 0, 0, IDCMP_CLOSEWINDOW | IDCMP_VANILLAKEY | IDCMP_RAWKEY, WFLG_CLOSEGADGET | WFLG_SUPER_BITMAP, 0, 0, (UBYTE*)"LunAmiga", 0, 0, 320, 200, 320, 200, CUSTOMSCREEN};
 	int DeathFrames[5] = {68, 69, 70, 71, 67};
 	int GameOverColRamp[8] = {1, 11, 3, 12, 4, 2, 9, 8};
 	char Hiscore[41] = "\0\0\0\0\0\0\0\0\0\0\0\0\x8\x9\x13\x3\xF\x12\x5\0\0\x30\x30\x30\x30\x30\x30\x30\0\0\0\0\0\0\0\0\0\0\0\0";
@@ -437,33 +423,42 @@ void GameInit(maindata *lunadata) {
 	for(int i = 0; i < 27; i++)
 		lunadata->HighScoreText[i] = HighScoreText[i];
 
+	lunadata->mysbplanes = (char*)AllocMem(80 * 200 * 3, MEMF_PUBLIC | MEMF_CLEAR | MEMF_CHIP);
+	InitBitMap(&lunadata->mysbbitmap, 3, 640, 200);
+	lunadata->mysbbitmap.Planes[0] = (PLANEPTR)lunadata->mysbplanes;
+	lunadata->mysbbitmap.Planes[1] = (PLANEPTR)lunadata->mysbplanes + 80 * 200;
+	lunadata->mysbbitmap.Planes[2] = (PLANEPTR)lunadata->mysbplanes + 80 * 200 * 2;
+
 	lunadata->MyScreen = OpenScreen(&screen);
 	window.Screen = lunadata->MyScreen;
+	window.BitMap = &lunadata->mysbbitmap;
 	lunadata->MyWindow = OpenWindow(&window);
 	ActivateWindow(lunadata->MyWindow);
 	
 	lunadata->keymp = AmiCreateMsgPort();
 	lunadata->keyioreq = (struct IOStdReq*)AmiCreateIORequest((struct MsgPort*)lunadata->keymp, sizeof(struct IOStdReq));
 	OpenDevice("keyboard.device", 0, (struct IORequest*)lunadata->keyioreq, 0);
-	lunadata->mycharplanes = (char*)AllocMem(40 * 200 * 4, MEMF_PUBLIC | MEMF_CLEAR | MEMF_CHIP);
-	InitBitMap(&lunadata->mycharbitmap, 4, 320, 200);
+	
+	lunadata->mycharplanes = (char*)AllocMem(40 * 200 * 3, MEMF_PUBLIC | MEMF_CLEAR | MEMF_CHIP);
+	InitBitMap(&lunadata->mycharbitmap, 3, 320, 200);
 	lunadata->mycharbitmap.Planes[0] = (PLANEPTR)lunadata->mycharplanes;
 	lunadata->mycharbitmap.Planes[1] = (PLANEPTR)lunadata->mycharplanes + 40 * 200;
 	lunadata->mycharbitmap.Planes[2] = (PLANEPTR)lunadata->mycharplanes + 40 * 200 * 2;
-	lunadata->mycharbitmap.Planes[3] = (PLANEPTR)lunadata->mycharplanes + 40 * 200 * 3;
-	for(int i = 0; i < 16000; i++)
+	for(int i = 0; i < 12000; i++)
 		((UWORD*)lunadata->mycharplanes)[i] = myfontData[i];
-	for(int i = 0; i < 16; i++)
+	for(int i = 0; i < 8; i++)
 		SetRGB4(&lunadata->MyScreen->ViewPort, i, (myfontPaletteRGB4[i] & 0xF00) >> 8, (myfontPaletteRGB4[i] & 0x0F0) >> 4, myfontPaletteRGB4[i] & 0x00F);
-/*MOD
-	IMG_Init(IMG_INIT_PNG);
-	surf = IMG_Load("assets/font.png");
-	lunadata->gamefonttex = SDL_CreateTextureFromSurface(lunadata->mainrend, surf);
-	SDL_FreeSurface(surf);
-	surf = IMG_Load("assets/sprites.png");
-	lunadata->gamespritetex = SDL_CreateTextureFromSurface(lunadata->mainrend, surf);
-	SDL_FreeSurface(surf);
-*/	
+
+	lunadata->myspriteplanes = (char*)AllocMem(40 * 256 * 3, MEMF_PUBLIC | MEMF_CLEAR | MEMF_CHIP);
+	InitBitMap(&lunadata->myspritebitmap, 3, 320, 256);
+	lunadata->myspritebitmap.Planes[0] = (PLANEPTR)lunadata->myspriteplanes;
+	lunadata->myspritebitmap.Planes[1] = (PLANEPTR)lunadata->myspriteplanes + 40 * 256;
+	lunadata->myspritebitmap.Planes[2] = (PLANEPTR)lunadata->myspriteplanes + 40 * 256 * 2;
+	for(int i = 0; i < 15360; i++)
+		((UWORD*)lunadata->myspriteplanes)[i] = myspritesData[i];
+//	for(int i = 0; i < 8; i++)
+//		SetRGB4(&lunadata->MyScreen->ViewPort, i, (myspritesPaletteRGB4[i] & 0xF00) >> 8, (myspritesPaletteRGB4[i] & 0x0F0) >> 4, myspritesPaletteRGB4[i] & 0x00F);
+
 	lunadata->gamestate = GAMESTATE_MENU;
 	RandomInit(lunadata);
 	for(int i = 0; i < MAX_BULLETS; i++)
@@ -507,8 +502,10 @@ void GameClean(maindata *lunadata) {
 	SDL_DestroyTexture(lunadata->gamefonttex);
 	SDL_DestroyTexture(lunadata->gamespritetex);*/
 
-	if(lunadata->MyWindow)
-		FreeMem(lunadata->mycharplanes, 40 * 200 * 4);
+	if(lunadata->myspriteplanes)
+		FreeMem(lunadata->myspriteplanes, 40 * 256 * 3);
+	if(lunadata->mycharplanes)
+		FreeMem(lunadata->mycharplanes, 40 * 200 * 3);
 	if(lunadata->keyioreq != NULL) {
 		CloseDevice((struct IORequest*)lunadata->keyioreq);
 		AmiDeleteIORequest((struct IORequest*)lunadata->keyioreq);
@@ -520,6 +517,9 @@ void GameClean(maindata *lunadata) {
 		CloseWindow(lunadata->MyWindow);
 	if(lunadata->MyScreen)
 		CloseScreen(lunadata->MyScreen);
+	if(lunadata->MyWindow)
+		FreeMem(lunadata->mysbplanes, 80 * 200 * 3);
+	
 	if(lunadata->IntuitionBase)
 		CloseLibrary(lunadata->IntuitionBase);
 	if(lunadata->GraphicsBase)
@@ -529,79 +529,49 @@ void GameClean(maindata *lunadata) {
 }
 
 void GameDrawScreen(maindata *lunadata) {
-//MOD	SDL_Rect chsrc = {0, 0, FONTTILE_WIDTH, FONTTILE_HEIGHT}, chdest = {0, 0, FONTTILE_WIDTH, FONTTILE_HEIGHT};
-//MOD	SDL_Rect spsrc = {0, 0, SPRITETILE_WIDTH, SPRITETILE_HEIGHT}, spdest = {0, 0, SPRITETILE_WIDTH, SPRITETILE_HEIGHT};
-	int ch, sp, fsx = 72, fsy = 100;
-	int chsrcx, chsrcy, chdestx, chdesty;
-	static int qq = 0;
+	int ch, sp;
+	int srcx, srcy, destx, desty;
 
-fsx=0;
-fsy=0;
-	for(int y = 0; y < 25; y++) {
-		for( int x = 0; x < 40; x++) {
-			ch = lunadata->SCREEN[y * 40 + x];
-			chsrcx = (ch % 32) * FONTTILE_WIDTH;
-			chsrcy = (ch / 32) * FONTTILE_HEIGHT;
-			if(lunadata->gamestate == GAMESTATE_MENU) {
-				if(((y > 1) && (y < 6)) || ((y > 16) && (y < 25)))
-					chdestx = x * FONTTILE_WIDTH + lunadata->map.Hscroll + fsx;
-				else
-					chdestx = x * FONTTILE_WIDTH + fsx;
-			} else {
-				if(y < 24)
-					chdestx = x * FONTTILE_WIDTH + lunadata->map.Hscroll + fsx;
-				else
-					chdestx = x * FONTTILE_WIDTH + fsx;
+	if(lunadata->ScreenClear) {
+		for(int y = 0; y < 25; y++) {
+			for( int x = 0; x < 40; x++) {
+				ch = lunadata->SCREEN[y * 40 + x];
+				srcx = (ch % 32) * FONTTILE_WIDTH;
+				srcy = (ch / 32) * FONTTILE_HEIGHT;
+				BltBitMap(&lunadata->mycharbitmap, srcx, srcy, lunadata->MyWindow->RPort->BitMap, x * FONTTILE_WIDTH + lunadata->ScreenOffsetX * 8, y * FONTTILE_HEIGHT, FONTTILE_WIDTH, FONTTILE_HEIGHT, 0xC0, 0xFF, NULL);
 			}
-			chdesty = y * FONTTILE_HEIGHT + fsy;
-if(chdestx > 312)
-	chdestx = 312;
-if((qq == 0) || ((x == 39) && ((qq % 8) == 0)))
-			BltBitMap(&lunadata->mycharbitmap, chsrcx, chsrcy, lunadata->MyWindow->RPort->BitMap, chdestx, chdesty, FONTTILE_WIDTH, FONTTILE_HEIGHT, 0xC0, 0xFF, NULL);
 		}
+		lunadata->ScreenClear = 0;
 	}
-//if((qq % 8) == 0)
-	BltBitMap(lunadata->MyWindow->RPort->BitMap, 0 + (qq % 8), 0, lunadata->MyWindow->RPort->BitMap, 0, 0, 320 - (qq % 8), 200, 0xC0, 0xFF, NULL);
-	
-/*MOD	ch = 128;
+
+	ch = 128;
 	for(int i = 7; i >= 0; i--) {
 		if(lunadata->SPRITE_ENA & ch) {
 			sp = lunadata->SPRITE_PTRS[i] - 64;
 			if(sp >= 0) {
-				spsrc.x = (sp % 8) * SPRITETILE_WIDTH;
-				spsrc.y = (sp / 8) * SPRITETILE_HEIGHT;
-				spdest.x = (lunadata->SPRITE_X[i] - 0x18) * 2 + fsx;
-				spdest.y = (lunadata->SPRITE_Y[i] - 0x32) * 2 + fsy;
-				SDL_RenderCopy(lunadata->mainrend, lunadata->gamespritetex, &spsrc, &spdest);
+				if(lunadata->SPRITE_OLDX[i] < 999)
+					BltBitMap(&lunadata->myspritebitmap, 8 * SPRITETILE_WIDTH, i * SPRITETILE_HEIGHT, lunadata->MyWindow->RPort->BitMap, lunadata->SPRITE_OLDX[i], lunadata->SPRITE_OLDY[i], SPRITETILE_WIDTH, SPRITETILE_HEIGHT, 0xC0, 0xFF, NULL);
+				if(((lunadata->SPRITE_X[i] > 0x18) && (lunadata->SPRITE_X[i] < 0x158)) && ((lunadata->SPRITE_Y[i] > 0x32) && (lunadata->SPRITE_Y[i] < 0xFA))) {
+					srcx = (sp % 8) * SPRITETILE_WIDTH;
+					srcy = (sp / 8) * SPRITETILE_HEIGHT;
+					destx = (lunadata->SPRITE_X[i] - 0x18) + lunadata->ScreenOffsetX * 8;
+					desty = (lunadata->SPRITE_Y[i] - 0x32);
+					lunadata->SPRITE_OLDX[i] = destx;
+					lunadata->SPRITE_OLDY[i] = desty;
+					BltBitMap(lunadata->MyWindow->RPort->BitMap, destx, desty, &lunadata->myspritebitmap, 8 * SPRITETILE_WIDTH, i * SPRITETILE_HEIGHT, SPRITETILE_WIDTH, SPRITETILE_HEIGHT, 0xC0, 0xFF, NULL);
+					BltBitMap(&lunadata->myspritebitmap, srcx, srcy, lunadata->MyWindow->RPort->BitMap, destx, desty, SPRITETILE_WIDTH, SPRITETILE_HEIGHT, 0xE0, 0xFF, NULL);
+				} else
+					lunadata->SPRITE_OLDX[i] = 999;
 			}
 		}
 		ch = ch >> 1;
 	}
-*/	
-//qq=1;
-}
-
-void GameDelay(maindata *lunadata) {
-/*	static std::chrono::high_resolution_clock::time_point last_time;
-	std::chrono::high_resolution_clock::time_point time;
-	std::chrono::duration<double, std::milli> time_span;
-
-	do {
-		time = std::chrono::high_resolution_clock::now();
-		time_span = time - last_time;
-		if(time_span.count() < 18.0)
-			SDL_Delay(1);
-	} while(time_span.count() < 20.0);
-
-	time = std::chrono::high_resolution_clock::now();
-	last_time = time;*/
-
-	Delay(1);
 }
 
 void GameClearScreen(maindata *lunadata) {
 	for(int i = 0; i < 1000; i++)
 		lunadata->SCREEN[i] = 0;
+	lunadata->ScreenClear = 1;
 }
 
 void GameClearColor(struct maindata *lunadata) {

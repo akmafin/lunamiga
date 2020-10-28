@@ -13,7 +13,7 @@
 struct sound {
 //	Mix_Music *musicgame, *musicgameover;
 //	Mix_Chunk *mixchunk[NUM_SOUNDS] = {0};
-	int sndchan[NUM_SOUNDS] = {-1, -1, -1, -1};
+//	int sndchan[NUM_SOUNDS] = {-1, -1, -1, -1};
 };
 
 void SoundInit(maindata *lunadata);

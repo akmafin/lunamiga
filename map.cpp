@@ -1,6 +1,26 @@
 #include "lunamiga.h"
 //#include <iostream>
 void MapInit(maindata *lunadata) {
+	int DecorateTypeChars[4] = {0, 0, 141, 142};
+	int GrassTop[3] = {130, 129, 128}, CeilTop[3] = {131, 132, 133};
+	int HoleData[32] = {137, 138, 139, 140, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
+		135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135};
+	int MapColors[16] = {11, 6, 2, 13, 4, 11, 11, 3,
+		8, 14, 10, 9, 3, 7, 12, 2};
+
+	lunadata->map.Hscroll = 7;
+	lunadata->map.DirRandom = -64;
+	for(int i = 0; i < 4; i++)
+		lunadata->map.DecorateTypeChars[i] = DecorateTypeChars[i];
+	for(int i = 0; i < 3; i++)
+		lunadata->map.GrassTop[i] = GrassTop[i];
+	for(int i = 0; i < 3; i++)
+		lunadata->map.CeilTop[i] = CeilTop[i];
+	for(int i = 0; i < 32; i++)
+		lunadata->map.HoleData[i] = HoleData[i];
+	for(int i = 0; i < 16; i++)
+		lunadata->map.MapColors[i] = MapColors[i];
+
 	lunadata->map.MapCols = -1;
 	MapChangeMapColors(lunadata);
 	GameClearScreen(lunadata);
@@ -194,13 +214,30 @@ void MapGenerateColumn(maindata *lunadata) {
 }
 
 void MapAdvanceMap(maindata *lunadata) {
+	int ch, sp;
+	int chsrcx, chsrcy, chdestx, chdesty;
+
 	lunadata->map.NeedToShift = 0;
 	lunadata->map.Hscroll -= lunadata->map.HscrollSpeed;
 	if(lunadata->map.Hscroll < 0) {
 		lunadata->map.Hscroll = lunadata->map.Hscroll & 7;
 		MapGenerateColumn(lunadata);
 		lunadata->map.NeedToShift = 1;
+		lunadata->ScreenOffsetX++;
+		if(lunadata->ScreenOffsetX > 39)
+			lunadata->ScreenOffsetX = 0;
+
+		for(int y = 0; y < 25; y++) {
+			ch = lunadata->SCREEN[y * 40 + 39];
+			chsrcx = (ch % 32) * FONTTILE_WIDTH;
+			chsrcy = (ch / 32) * FONTTILE_HEIGHT;
+			chdestx = 40 * FONTTILE_WIDTH + lunadata->ScreenOffsetX * 8;
+			chdesty = y * FONTTILE_HEIGHT;
+			BltBitMap(&lunadata->mycharbitmap, chsrcx, chsrcy, lunadata->MyWindow->RPort->BitMap, chdestx, chdesty, FONTTILE_WIDTH, FONTTILE_HEIGHT, 0xC0, 0xFF, NULL);
+		}
 	}
+	lunadata->MyScreen->ViewPort.RasInfo->RxOffset = lunadata->ScreenOffsetX * 8 + (7 - lunadata->map.Hscroll);
+	ScrollVPort(&lunadata->MyScreen->ViewPort);
 }
 
 void MapScreenShift(maindata *lunadata) {
