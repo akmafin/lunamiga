@@ -238,6 +238,7 @@ void MapAdvanceMap(maindata *lunadata) {
 	}
 	lunadata->MyScreen->ViewPort.RasInfo->RxOffset = lunadata->ScreenOffsetX * 8 + (7 - lunadata->map.Hscroll);
 	ScrollVPort(&lunadata->MyScreen->ViewPort);
+//ScrollRaster(&lunadata->MyScreen->RastPort, (7 - lunadata->map.Hscroll), 0, 0, 0, 320, 200);
 }
 
 void MapScreenShift(maindata *lunadata) {
